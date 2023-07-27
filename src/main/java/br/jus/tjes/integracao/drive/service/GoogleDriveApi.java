@@ -8,19 +8,16 @@ import org.apache.http.HttpHeaders;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-
-import com.google.gson.Gson;
 
 import br.jus.tjes.integracao.drive.dto.ArquivoDTO;
 import br.jus.tjes.integracao.drive.google.beans.File;
 import br.jus.tjes.integracao.drive.google.beans.ListGoogleFiles;
 import br.jus.tjes.integracao.drive.security.GoogleAuthentication;
+import br.jus.tjes.integracao.drive.util.RestUtil;
 
 /**
  * https://www.googleapis.com/discovery/v1/apis/drive/v3/rest
@@ -28,27 +25,21 @@ import br.jus.tjes.integracao.drive.security.GoogleAuthentication;
  */
 @Service
 public class GoogleDriveApi {
+	private static final Logger LOG = LoggerFactory.getLogger(GoogleDriveApi.class);
 	private static final String PATH_ARQUIVO = "/%s/arquivos/%s";
 	private static final String PATH_DOWNLOAD = PATH_ARQUIVO + "/download";
-	private static final Logger LOG = LoggerFactory.getLogger(GoogleDriveApi.class);
 	public static final String BASE_URL = "https://www.googleapis.com/drive/v3/";
 	public static final String URL_LIST_FILES = BASE_URL + "files/";
 
 	public List<ArquivoDTO> listarArquivos(String numeroProcesso) {
-		CloseableHttpClient httpClient = HttpClients.createDefault();
 		HttpGet request = new HttpGet(URL_LIST_FILES);
 		addBasicHeaders(request);
-
-		try (CloseableHttpResponse response = httpClient.execute(request)) {
+		try (CloseableHttpResponse response = HttpClients.createDefault().execute(request)) {
 			logarRequisicao(response, URL_LIST_FILES, numeroProcesso);
-			if (!isOK(response)) {
-				throw new RuntimeException(
-						"Erro na comunicação com o Google Drive:" + response.getStatusLine().getStatusCode());
-			}
+			validarRequisicao(response);
 			HttpEntity entity = response.getEntity();
 			if (entity != null) {
-				String result = EntityUtils.toString(entity);
-				ListGoogleFiles listGooleFiles = new Gson().fromJson(result, ListGoogleFiles.class);
+				ListGoogleFiles listGooleFiles = RestUtil.convertEntityToObject(entity, ListGoogleFiles.class);
 				List<ArquivoDTO> listArquivos = convertToListArquivoDTO(listGooleFiles, numeroProcesso);
 				return listArquivos;
 			}
@@ -59,8 +50,36 @@ public class GoogleDriveApi {
 
 	}
 
+	public ArquivoDTO getArquivo(String numeroProcesso, String idArquivo) {
+		String uri = URL_LIST_FILES + idArquivo;
+		HttpGet request = new HttpGet(uri);
+		addBasicHeaders(request);
+		try (CloseableHttpResponse response = HttpClients.createDefault().execute(request)) {
+			logarRequisicao(response, uri, numeroProcesso);
+			validarRequisicao(response);
+			HttpEntity entity = response.getEntity();
+			if (entity != null) {
+				File file = RestUtil.convertEntityToObject(entity, File.class);
+				ArquivoDTO listArquivos = convertToArquivoDTO(file, numeroProcesso);
+				return listArquivos;
+			}
+			return null;
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private void validarRequisicao(CloseableHttpResponse response) {
+		if (!isOK(response)) {
+			throw new RuntimeException(
+					"Erro na comunicação com o Google Drive:" + response.getStatusLine().getStatusCode());
+		}
+	}
+
 	private void addBasicHeaders(HttpGet request) {
-		request.addHeader(HttpHeaders.AUTHORIZATION, getToken());
+		String token = getToken();
+		LOG.debug(String.format("Token: [%s]", token));
+		request.addHeader(HttpHeaders.AUTHORIZATION, token);
 	}
 
 	private List<ArquivoDTO> convertToListArquivoDTO(ListGoogleFiles listGooleFiles, String numeroProcesso) {
@@ -117,31 +136,6 @@ public class GoogleDriveApi {
 
 	private String getToken() {
 		return "Bearer " + GoogleAuthentication.getAccessToken().getTokenValue();
-	}
-
-	public ArquivoDTO getArquivo(String numeroProcesso, String idArquivo) {
-		CloseableHttpClient httpClient = HttpClients.createDefault();
-		String uri = URL_LIST_FILES + idArquivo;
-		HttpGet request = new HttpGet(uri);
-		addBasicHeaders(request);
-
-		try (CloseableHttpResponse response = httpClient.execute(request)) {
-			logarRequisicao(response, uri, numeroProcesso);
-			if (!isOK(response)) {
-				throw new RuntimeException(
-						"Erro na comunicação com o Google Drive:" + response.getStatusLine().getStatusCode());
-			}
-			HttpEntity entity = response.getEntity();
-			if (entity != null) {
-				String result = EntityUtils.toString(entity);
-				File file = new Gson().fromJson(result, File.class);
-				ArquivoDTO listArquivos = convertToArquivoDTO(file, numeroProcesso);
-				return listArquivos;
-			}
-			return null;
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
 	}
 
 }
