@@ -4,10 +4,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class ApiGoogleDriveApplication {
+public class DriveApiApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(ApiGoogleDriveApplication.class, args);
+		SpringApplication.run(DriveApiApplication.class, args);
 	}
 
 }
