@@ -1,0 +1,36 @@
+server:
+  port: 8585
+  context-path: /storage-service
+ 
+spring:
+  application:
+    name: storage-service
+  pje:
+    datasource:
+      platform: postgres
+      driver-class-name: org.postgresql.Driver
+      url: jdbc:postgresql://localhost:5432?stringtype=unspecified&prepareThreshold=0
+      username: postgres
+      password: postgres
+  data:
+    rest:
+      max-page-size: 10000
+      detection-strategy: annotated    
+  jackson:
+      time-zone: ${TZ:America/Sao_Paulo}
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: ${SHOW_SQL:true}
+    properties:
+      hibernate:
+        temp:
+            use_jdbc_metadata_defaults: false
+        dialect: org.hibernate.dialect.PostgreSQLDialect 
+
+environments:
+    secretjwt: ${PJE_INTEGRACAO_SECRET_JWT:123456}
+
+
+
+
