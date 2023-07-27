@@ -8,8 +8,8 @@
 		<version>3.1.2</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>br.jus.tjes.google.drive</groupId>
-	<artifactId>api-google-drive</artifactId>
+	<groupId>br.jus.tjes.integracao.drive</groupId>
+	<artifactId>api-drive</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>api-google-drive</name>
 	<description>Projeto para integrar com o google drive</description>
@@ -63,11 +63,11 @@
 			<version>v3-rev20211107-1.32.1</version>
 		</dependency>
 		
-			<dependency>
-			<groupId>io.springfox</groupId>
-			<artifactId>springfox-swagger2</artifactId>
-			<version>2.9.2</version>
-		</dependency>
+	   <dependency>
+	      <groupId>org.springdoc</groupId>
+	      <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+	      <version>2.0.0</version>
+	   </dependency>
 	</dependencies>
 
 	<build>

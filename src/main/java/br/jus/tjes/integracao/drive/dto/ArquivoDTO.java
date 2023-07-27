@@ -1,4 +1,4 @@
-package br.jus.tjes.google.drive.dto;
+package br.jus.tjes.integracao.drive.dto;
 
 public class ArquivoDTO {
 	private String id;

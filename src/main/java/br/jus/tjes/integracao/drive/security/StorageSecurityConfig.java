@@ -1,4 +1,4 @@
-package br.jus.tjes.google.drive.security;
+package br.jus.tjes.integracao.drive.security;
 
 import org.springframework.context.annotation.Configuration;
 

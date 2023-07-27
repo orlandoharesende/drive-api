@@ -1,4 +1,4 @@
-package br.jus.tjes.google.drive.apigoogledrive;
+package br.jus.tjes.integracao.drive;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
