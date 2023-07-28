@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<ehcache xsi:noNamespaceSchemaLocation="ehcache.xsd"
+	updateCheck="true" monitoring="autodetect" dynamicConfig="true">
+	<cache name="DriveApiService::listarArquivosPorDiretorioProcesso"
+		maxEntriesLocalHeap="10000" timeToLiveSeconds="3600" eternal="false"
+		memoryStoreEvictionPolicy="LRU">
+		<pinning store="localMemory" />
+	</cache>
+	<cache name="DriveApiService::getArquivo"
+		maxEntriesLocalHeap="10000" timeToLiveSeconds="3600" eternal="false"
+		memoryStoreEvictionPolicy="LRU">
+		<pinning store="localMemory" />
+	</cache>
+	<cache name="GoogleDriveApi::listarArquivos"
+		maxEntriesLocalHeap="10000" timeToLiveSeconds="3600" eternal="false"
+		memoryStoreEvictionPolicy="LRU">
+		<pinning store="localMemory" />
+	</cache>
+	<cache name="GoogleDriveApi::getArquivo"
+		maxEntriesLocalHeap="10000" timeToLiveSeconds="3600" eternal="false"
+		memoryStoreEvictionPolicy="LRU">
+		<pinning store="localMemory" />
+	</cache>
+
+</ehcache>

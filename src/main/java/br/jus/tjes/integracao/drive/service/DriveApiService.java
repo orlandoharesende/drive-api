@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import br.jus.tjes.integracao.drive.dto.ArquivoDTO;
@@ -16,6 +17,7 @@ public class DriveApiService {
 	@Autowired
 	private GoogleDriveApi googleDriveApi;
 
+	@Cacheable(value = "DriveApiService::listarArquivosPorDiretorioProcesso")
 	public List<ArquivoDTO> listarArquivosPorDiretorioProcesso(String numeroProcesso) {
 		validarNumeroProcesso(numeroProcesso);
 		List<ArquivoDTO> listaDiretorios = googleDriveApi.listarArquivos(numeroProcesso,
@@ -45,6 +47,7 @@ public class DriveApiService {
 		return q("name = '%s' and mimeType = '%s'", numeroProcesso, GoogleDriveApi.MIME_TYPE_FOLDER);
 	}
 
+	@Cacheable(value = "DriveApiService::getArquivo")
 	public ArquivoDTO getArquivo(String numeroProcesso, String idArquivo) {
 		validarNumeroProcesso(numeroProcesso);
 		return googleDriveApi.getArquivo(numeroProcesso, idArquivo);

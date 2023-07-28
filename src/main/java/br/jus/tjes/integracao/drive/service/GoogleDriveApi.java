@@ -19,6 +19,7 @@ import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import br.jus.tjes.integracao.drive.dto.ArquivoDTO;
@@ -44,6 +45,7 @@ public class GoogleDriveApi {
 	@Autowired
 	private GoogleAuthentication googleAuthentication;
 
+	@Cacheable(value = "GoogleDriveApi::listarArquivos")
 	public List<ArquivoDTO> listarArquivos(String numeroProcesso, String query) {
 		HttpGet request = new HttpGet(URL_LIST_FILES);
 		addBasicHeaders(request);
@@ -66,6 +68,7 @@ public class GoogleDriveApi {
 
 	}
 
+	@Cacheable(value = "GoogleDriveApi::getArquivo")
 	public ArquivoDTO getArquivo(String numeroProcesso, String idArquivo) {
 		String uri = URL_LIST_FILES + idArquivo;
 		HttpGet request = new HttpGet(uri);
