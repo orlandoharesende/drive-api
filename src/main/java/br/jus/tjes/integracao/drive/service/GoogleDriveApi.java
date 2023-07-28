@@ -18,6 +18,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import br.jus.tjes.integracao.drive.dto.ArquivoDTO;
@@ -40,11 +41,14 @@ public class GoogleDriveApi {
 	public static final String URL_LIST_FILES = BASE_URL + "files/";
 	public static final Object MIME_TYPE_FOLDER = "application/vnd.google-apps.folder";
 
+	@Autowired
+	private GoogleAuthentication googleAuthentication;
+
 	public List<ArquivoDTO> listarArquivos(String numeroProcesso, String query) {
 		HttpGet request = new HttpGet(URL_LIST_FILES);
 		addBasicHeaders(request);
-		if(query != null) {
-			addQueryParams(request, Arrays.asList(new BasicNameValuePair("q", query)));	
+		if (query != null) {
+			addQueryParams(request, Arrays.asList(new BasicNameValuePair("q", query)));
 		}
 		try (CloseableHttpResponse response = HttpClients.createDefault().execute(request)) {
 			logarRequisicao(response, URL_LIST_FILES, numeroProcesso);
@@ -175,7 +179,7 @@ public class GoogleDriveApi {
 	}
 
 	private String getToken() {
-		return "Bearer " + GoogleAuthentication.getAccessToken().getTokenValue();
+		return "Bearer " + googleAuthentication.getAccessToken().getTokenValue();
 	}
 
 }
