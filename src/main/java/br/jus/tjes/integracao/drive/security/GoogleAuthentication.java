@@ -46,9 +46,9 @@ public class GoogleAuthentication {
 		GoogleCredentials credentials = GoogleCredentials.fromStream(new FileInputStream(ARQUIVO_CREDENCIAIS))
 				.createScoped(Arrays.asList(DriveScopes.DRIVE));
 		if (credentials.getAccessToken() != null) {
-			LOG.info("Token criado: " + credentials.getAccessToken());
-		} else {
 			LOG.error("Erro. Token não gerado!");
+		} else {
+			LOG.info("Token criado: " + credentials.getAccessToken());
 		}
 		return credentials;
 	}
