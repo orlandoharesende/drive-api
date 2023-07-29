@@ -45,7 +45,7 @@ public class GoogleDriveApi {
 	@Autowired
 	private GoogleAuthentication googleAuthentication;
 
-	@Cacheable(value = "GoogleDriveApi::listarArquivos")
+	@Cacheable(value = "GoogleDriveApiListarArquivos")
 	public List<ArquivoDTO> listarArquivos(String numeroProcesso, String query) {
 		HttpGet request = new HttpGet(URL_LIST_FILES);
 		addBasicHeaders(request);
@@ -68,7 +68,7 @@ public class GoogleDriveApi {
 
 	}
 
-	@Cacheable(value = "GoogleDriveApi::getArquivo")
+	@Cacheable(value = "GoogleDriveApiGetArquivo")
 	public ArquivoDTO getArquivo(String numeroProcesso, String idArquivo) {
 		String uri = URL_LIST_FILES + idArquivo;
 		HttpGet request = new HttpGet(uri);

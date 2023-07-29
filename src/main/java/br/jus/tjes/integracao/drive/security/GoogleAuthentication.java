@@ -35,6 +35,7 @@ public class GoogleAuthentication {
 			}
 			return accessToken;
 		} catch (Exception e) {
+			e.printStackTrace();
 			this.credentials = null;
 			throw new RuntimeException("Não foi possível obter o token de autenticação com a Google.");
 		}

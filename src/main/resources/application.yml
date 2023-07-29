@@ -27,7 +27,9 @@ spring:
         temp:
             use_jdbc_metadata_defaults: false
         dialect: org.hibernate.dialect.PostgreSQLDialect 
-
+  cache:
+    jcache:
+      config: classpath:ehcache.xml
 environments:
     secretjwt: ${PJE_INTEGRACAO_SECRET_JWT:123456}
 
