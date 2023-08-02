@@ -7,6 +7,7 @@ import java.util.Arrays;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.ApplicationScope;
 
@@ -17,8 +18,9 @@ import com.google.auth.oauth2.GoogleCredentials;
 @Component
 @ApplicationScope
 public class GoogleAuthentication {
-	private static final String ARQUIVO_CREDENCIAIS = "/home/orlando/tjes/integracao-google/user-google-drive-orlando.json";
 	private static final Logger LOG = LoggerFactory.getLogger(GoogleAuthentication.class);
+	@Value("${environments.pathArquivoCredenciais}")
+	private String pathArquivoCredenciais;
 	private GoogleCredentials credentials;
 
 	public AccessToken getAccessToken() {
@@ -43,7 +45,7 @@ public class GoogleAuthentication {
 
 	private GoogleCredentials createCredentials() throws IOException, FileNotFoundException {
 		LOG.info("Criando novo google token");
-		GoogleCredentials credentials = GoogleCredentials.fromStream(new FileInputStream(ARQUIVO_CREDENCIAIS))
+		GoogleCredentials credentials = GoogleCredentials.fromStream(new FileInputStream(pathArquivoCredenciais))
 				.createScoped(Arrays.asList(DriveScopes.DRIVE));
 		if (credentials.getAccessToken() != null) {
 			LOG.error("Erro. Token não gerado!");

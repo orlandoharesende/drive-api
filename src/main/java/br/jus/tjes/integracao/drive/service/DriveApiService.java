@@ -59,9 +59,10 @@ public class DriveApiService {
 	}
 
 	private void validarNumeroProcesso(String numeroProcesso) {
-		if (!NumeroProcessoUtil.numeroProcessoValido(numeroProcesso)) {
-			throw new NumeroProcessoInvalidoException();
-		}
+		/*
+		 * if (!NumeroProcessoUtil.numeroProcessoValido(numeroProcesso)) { throw new
+		 * NumeroProcessoInvalidoException(); }
+		 */
 	}
 
 	private String q(String query, Object... valores) {

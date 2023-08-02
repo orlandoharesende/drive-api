@@ -31,8 +31,4 @@ spring:
     jcache:
       config: classpath:ehcache.xml
 environments:
-    secretjwt: ${PJE_INTEGRACAO_SECRET_JWT:123456}
-
-
-
-
+    pathArquivoCredenciais: /home/orlando/tjes/integracao-google/user-google-drive-orlando.json
