@@ -2,13 +2,10 @@ package br.jus.tjes.integracao.drive.controller;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
