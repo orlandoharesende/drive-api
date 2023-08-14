@@ -32,16 +32,18 @@ public class JwtTokenUtil implements Serializable {
 	private static final long  TEMPO_DURACAO_TOKEN = 3000000;
 	
 	
-	public static String geradorDeTokenTemporario(String subject, Map<String, String> parametrosAdicionais,
+	public static String geradorDeTokenTemporario(String idUsuario, Map<String, String> parametrosAdicionais,
 			String emissor) {
-
-		long now = System.currentTimeMillis();
-		Date dataAtual = new Date(now);
-		Date dataExpiracao = new Date(now + TEMPO_DURACAO_TOKEN);
-		JwtBuilder jwt = Jwts.builder().setIssuer(emissor).setAudience(emissor).setSubject(subject)
-				.setIssuedAt(dataAtual).setExpiration(dataExpiracao).signWith(SignatureAlgorithm.HS512, getChave());
-		parametrosAdicionais.entrySet().stream().forEach(p -> jwt.claim(p.getKey(), p.getValue()));
-		return jwt.compact();
+		/*
+		 * long now = System.currentTimeMillis(); Date dataAtual = new Date(now); Date
+		 * dataExpiracao = new Date(now + TEMPO_DURACAO_TOKEN); JwtBuilder jwt =
+		 * Jwts.builder().setIssuer(emissor).setAudience(emissor).setSubject(subject)
+		 * .setIssuedAt(dataAtual).setExpiration(dataExpiracao).signWith(
+		 * SignatureAlgorithm.HS512, getChave());
+		 * parametrosAdicionais.entrySet().stream().forEach(p -> jwt.claim(p.getKey(),
+		 * p.getValue())); return jwt.compact();
+		 */
+		return null;
 	}
 	
 	public static Claims extrairInformacoesToken(String token) {

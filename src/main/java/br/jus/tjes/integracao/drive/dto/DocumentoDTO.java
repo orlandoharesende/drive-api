@@ -17,12 +17,14 @@ public class DocumentoDTO {
 	@NotNull(message = "Número do processo não pode ser nulo")
 	private String numeroProcesso;
 
-	public String getIdUSer() {
+	
+
+	public String getIdUser() {
 		return idUser;
 	}
 
-	public void setIdUser(String cpf) {
-		this.idUser = cpf;
+	public void setIdUser(String idUser) {
+		this.idUser = idUser;
 	}
 
 	public String getIdDoc() {

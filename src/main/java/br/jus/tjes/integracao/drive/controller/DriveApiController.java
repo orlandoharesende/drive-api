@@ -5,6 +5,7 @@ import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.apache.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,8 +23,9 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import br.jus.tjes.integracao.drive.dto.ArquivoDTO;
 import br.jus.tjes.integracao.drive.dto.DocumentoDTO;
+import br.jus.tjes.integracao.drive.models.TokenDocumento;
 import br.jus.tjes.integracao.drive.service.DriveApiService;
-import br.jus.tjes.integracao.drive.service.UrlTemporarioService;
+import br.jus.tjes.integracao.drive.service.UrlTemporariaService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -36,7 +38,7 @@ public class DriveApiController {
 	private DriveApiService service;
 	
 	@Autowired
-	private UrlTemporarioService urlTemp;
+	private UrlTemporariaService urlTemp;
 
 	@Operation(summary = "Consulta Lista de Arquivos")
 	@GetMapping(path = "/{numero-processo}/arquivos", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -92,12 +94,11 @@ public class DriveApiController {
 	public ResponseEntity<?> download(@RequestParam String id) {
 		ResponseEntity<byte[]> resposta = null;
 		String baseUrl = ServletUriComponentsBuilder.fromCurrentServletMapping().build().toUriString();
-		Boolean isValido = urlTemp.validarToken(id,baseUrl);
-		if(isValido) {
-			String numeroProcesso = urlTemp.extrairNrProcesso(id);
-			String idDocGoogle = urlTemp.extrairIdDocumentoGoogle(id);
-			ArquivoDTO arquivoDTO = service.getArquivo(numeroProcesso, idDocGoogle);
-			byte[] arquivo = service.getArquivoEmBytes(numeroProcesso, idDocGoogle);
+		TokenDocumento td = urlTemp.validarUrl(id,baseUrl);
+		if(Objects.nonNull(td)) {
+			
+			ArquivoDTO arquivoDTO = service.getArquivo(td.getNumeroProcesso(),td.getIdDocumento());
+			byte[] arquivo = service.getArquivoEmBytes(td.getNumeroProcesso(),td.getIdDocumento());
 			HttpHeaders headers = new HttpHeaders();
 			headers.add(HttpHeaders.CONTENT_TYPE, arquivoDTO.getMimeType());
 			headers.add(HttpHeaders.CONTENT_DISPOSITION,"inline;filename="+arquivoDTO.getNome());

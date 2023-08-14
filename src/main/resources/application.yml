@@ -37,6 +37,7 @@ environments:
     urlTemporaria:
       tempoExpiracaoEmSegundos: 60
       qtdUtilizacaoPermitida: 2
+      secret: MTIzNDU2NzgwYWJjZGVmZ2hpamtsw6dsbHh6MHdxbMOnw6dz4bmVZGZzZnNhw6dsw6dzYWRvMGprc3BzbHNsc21wcXJldA==
    
     
     
