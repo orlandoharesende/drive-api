@@ -1,49 +1,35 @@
 package br.jus.tjes.integracao.drive.service;
 
-import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import br.jus.tjes.integracao.drive.dto.ArquivoDTO;
 import br.jus.tjes.integracao.drive.dto.DocumentoDTO;
 import br.jus.tjes.integracao.drive.enums.EnumClaimsAdicionais;
+import br.jus.tjes.integracao.drive.exception.UrlInvalidaException;
 import br.jus.tjes.integracao.drive.models.TokenDocumento;
-import br.jus.tjes.integracao.drive.util.JwtTokenUtil;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.security.SignatureException;
 
 @Service
 public class UrlTemporariaService {
 	
-	/*
-	 * public static final String NR_PROCESSO = "nrprocesso";
-	 * 
-	 * public static final String ID_DOC_GOOGLE = "iddoc";
-	 */
+	
 	@Autowired
 	private TokenService tokenService;
+	@Autowired
+	private DriveApiService driveService;
 	
 	@Value("${environments.urlTemporaria.tempoExpiracaoEmSegundos}")
 	private Integer expiracao;
-	
-	public TokenDocumento validarUrl(String token,String emissor) {
-
-		TokenDocumento tokenDoc = tokenService.recuperarInformacoesDoToken(token);
-		long now = System.currentTimeMillis();
-		Date data = new Date(now);
-		 if(!tokenDoc.getDataExpiracao().after(data) ||  !emissor.equals(tokenDoc.getEmissor()))
-		 {
-			 //Lançar excecao
-			 
-			 return null;
-		 }
-		 return tokenDoc;
-	}
 	
 	
 	
@@ -62,6 +48,32 @@ public class UrlTemporariaService {
 		String token = tokenService.geradorDeTokenTemporario(claims);
 		return baseUrl.concat("/download/tmp?").concat("id=").concat(token);
 	}
+	
+	public TokenDocumento getArquivoRemoto(String token, String emissor) throws UrlInvalidaException, ExpiredJwtException, MalformedJwtException, SignatureException, JwtException {
+		
+		TokenDocumento tokenDoc = tokenService.recuperarInformacoesDoToken(token);
+		validar(tokenDoc, emissor);
+		ArquivoDTO arquivoDTO = driveService.getArquivo(tokenDoc.getNumeroProcesso(), tokenDoc.getIdDocumento());
+		byte[] arquivo = driveService.getArquivoEmBytes(tokenDoc.getNumeroProcesso(), tokenDoc.getIdDocumento());
+		tokenDoc.setArquivo(arquivoDTO);
+		tokenDoc.setArquivoPdf(arquivo);
+		return tokenDoc;
+		
+	}
+	
+	
+	private void validar(TokenDocumento tokenDoc, String emissor) throws UrlInvalidaException {
+
+		long now = System.currentTimeMillis();
+		Date data = new Date(now);
+		if (!tokenDoc.getDataExpiracao().after(data) || !emissor.equals(tokenDoc.getEmissor())) {
+
+			throw new UrlInvalidaException();
+		}
+
+		return;
+	}
+
 
 
 	

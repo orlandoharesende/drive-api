@@ -2,7 +2,7 @@ package br.jus.tjes.integracao.drive.exception;
 
 import java.util.Date;
 
-public class ErrorMessage {
+public class ErrorMessageUrl {
 
 	private String mensagem;
 	private Date data;
@@ -12,7 +12,7 @@ public class ErrorMessage {
 	
 	
 
-	public ErrorMessage(String mensagem, Date data, String descricao, Integer status) {
+	public ErrorMessageUrl(String mensagem, Date data, String descricao, Integer status) {
 		super();
 		this.mensagem = mensagem;
 		this.data = data;
@@ -20,8 +20,8 @@ public class ErrorMessage {
 		this.status = status;
 	}
 
-	public ErrorMessage() {
-		// TODO Auto-generated constructor stub
+	public ErrorMessageUrl() {
+		
 	}
 
 	public String getMensagem() {
