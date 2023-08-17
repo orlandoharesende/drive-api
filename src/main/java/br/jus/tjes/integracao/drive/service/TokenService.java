@@ -5,11 +5,14 @@ import java.util.Map;
 import javax.crypto.SecretKey;
 
 import org.apache.tomcat.util.buf.UriUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import br.jus.tjes.integracao.drive.enums.EnumClaimsAdicionais;
 import br.jus.tjes.integracao.drive.models.TokenDocumento;
+import br.jus.tjes.integracao.drive.security.GoogleAuthentication;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
@@ -28,7 +31,7 @@ public class TokenService {
 
 	@Value("${environments.urlTemporaria.secret}")
 	private String secret;
-
+	
 	public String geradorDeTokenTemporario(Map<String, Object> claims) {
 
 		return Jwts.builder().addClaims(claims).signWith(getKey(), SignatureAlgorithm.HS512).compact();
