@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 public class ArquivoDTO {
 	private String id;
 	private String nome;
+	private String numeroProcesso;
 	private String mimeType;
 	private boolean diretorio;
 	private String uri;
@@ -58,6 +59,14 @@ public class ArquivoDTO {
 
 	public void setDownload(String download) {
 		this.download = download;
+	}
+
+	public String getNumeroProcesso() {
+		return numeroProcesso;
+	}
+
+	public void setNumeroProcesso(String numeroProcesso) {
+		this.numeroProcesso = numeroProcesso;
 	}
 
 }
