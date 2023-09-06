@@ -29,7 +29,7 @@ public class DriveApiService {
 		ArquivoDTO diretorio = listaDiretorios.get(0);
 		List<ArquivoDTO> listaArquivos = googleDriveApi.listarArquivos(numeroProcesso,
 				getQueryListaArquivosPorDiretorio(diretorio));
-
+		listaArquivos.forEach(a -> a.setNumeroProcesso(numeroProcesso));
 		return listaArquivos;
 	}
 
