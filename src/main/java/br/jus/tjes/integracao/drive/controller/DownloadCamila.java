@@ -29,12 +29,12 @@ import br.jus.tjes.integracao.drive.util.Log;
 import br.jus.tjes.integracao.drive.util.Util;
 
 public class DownloadCamila {
-	private static final String ACCESS_TOKEN = "eyJraWQiOiJNOHNrM1VSdnZHMnhKZ3FkZDdYdGhWZnhyQVptdmVvMyIsImFsZyI6IlJTMjU2In0.eyJqdGkiOiJKV1QiLCJhdWQiOiJrZXlzdG9uZSIsImlzcyI6Im0ybS10b2tlbi1zZXJ2aWNlIiwic3ViIjoicHVibGljX3NoYXJlIiwic2NvcGVzIjoibmFzX3JlYWRfb25seSBuYXNfcmVhZF93cml0ZSIsImN1c3RvbUNsYWltcyI6eyJkZXZpY2VJZCI6ImRhYWE3ZmY4LTlhMjctNDE5Mi05Nzk2LTM0NTA3YTQzMGRkYyIsImF1dGhfaWQiOiI5MGJhYmUyOC1mN2IxLTRmZDktYTZlZi01M2VmYzQ2YmVmMDcifSwiZXhwIjoxNjk0NDgyMjQ4fQ.HtuiHE-4qsanG32EC4m1qE2C50rJq18F-SbmYq1_0gQOLE0vsH6JuXi2kze6IbOjXksGTJ7fbbNRjRevKdWZTFvjucihMq2PSZ7GYRwOAkvl04-o2AejmJM9ie_X4nWf5usGvqkdcOlgPnqwxFcMByPUP7PqbivNAxk5V9WqwVpjfrjcn82e_2i4EnyAokbglTy9qBk4CldPMUyBmhrZkWB8I1oNuXmV6Po5Jxj5SoCB8SWINhipiUdkBAm5nF6_WpRlqJ728Rqfih0KQOEb3dEylhLEETBqcY528U501N3_AtInWi8k-pGvNksJRFABIzsDlIm3x8fgFxiy7MoXlg";
+	private static final String ACCESS_TOKEN = "eyJraWQiOiJNOHNrM1VSdnZHMnhKZ3FkZDdYdGhWZnhyQVptdmVvMyIsImFsZyI6IlJTMjU2In0.eyJqdGkiOiJKV1QiLCJhdWQiOiJrZXlzdG9uZSIsImlzcyI6Im0ybS10b2tlbi1zZXJ2aWNlIiwic3ViIjoicHVibGljX3NoYXJlIiwic2NvcGVzIjoibmFzX3JlYWRfb25seSBuYXNfcmVhZF93cml0ZSIsImN1c3RvbUNsYWltcyI6eyJkZXZpY2VJZCI6ImRhYWE3ZmY4LTlhMjctNDE5Mi05Nzk2LTM0NTA3YTQzMGRkYyIsImF1dGhfaWQiOiI3MmU3MDNmMy00NGY0LTQzNGUtYjM3Yi0zMWE5OWQwOGExMGUifSwiZXhwIjoxNjk0NTA3NjQxfQ.arP8xdLaaFONMp3NG_0pvH6m8DtINpeErcZHoJEqmZayxJ6RyXdcpvH7YsExILKG8CHk-ozgSL-k29Km7xJOMjUUVmuEVtytLT7HkijXMGrgQYf07-Up97ZcCfSexZbp5AQ4c0IeNQVAbgyf1aH7KcmaR1Zb2P5hHE16EblUv3VmTLMVDtHUrQIaAoRCqZYZHGdd3keoVrURxSKgRBLIKDNa1cZiAt-mJtc5MsdBMvaoNJIX-5U7aSkmJS2KohB2R05VVEo2IUQUsseaohnl9OHuqog0r6jDRtz3_4WNuUo9vCc1c_BeOJQoHvSaideZWASOl1ac-Y7KlGwX_dL9eg";
 	private static final int UM_MINUTO_EM_MILLIS = 60 * 1000;
 	public static final String BASE_URL = "https://prod-7c74fffc718ed01.wdckeystone.com";
 	public static final String KEY = "daaa7ff8-9a27-4192-9796-34507a430ddc";
-	public static final String ID_DIRETORIO_PRINCIPAL = "shzyh3frigkvkhbp7ewopuvm";
-	public static final String ROOT_DIR = "/home/orlando/camila/pasta-02";
+	public static final String ID_DIRETORIO_PRINCIPAL = "kfimc4yxsv7sadaghrmtyzrv";
+	public static final String ROOT_DIR = "/home/orlando/camila/pasta-05";
 	static int qtdRequisicoes = 0;
 	public static final Integer DEFAULT_HTTP_CLIENT_TIMEOUT_IN_MILLIS = UM_MINUTO_EM_MILLIS * 10;
 
@@ -76,14 +76,19 @@ public class DownloadCamila {
 					Log.info("Fazer download do arquivo: " + name);
 					Log.info("Tamanho do arquivo: " + (file.getSize() / 1024 / 1024) + "MB");
 					try {
-						Thread.sleep(5000);
+						//Thread.sleep(5000);
 						byte[] arquivoEmBytes = download(file.getId());
-						Log.info("Arquivo baixado.");
-						Log.info("Gravando arquivo.");
-						Files.write(Paths.get(name), arquivoEmBytes);
-						Log.info("Arquivo gravado.");
+						if(arquivoEmBytes != null) {
+							Log.info("Arquivo baixado.");
+							Log.info("Gravando arquivo.");
+							Files.write(Paths.get(name), arquivoEmBytes);
+							Log.info("Arquivo gravado.");
+						}else {
+							Log.error("Erro ao baixar arquivo.");
+						}
 					} catch (Exception e) {
-						Log.info("Timeout ao baixar arquivo. Passando para o próximo");
+						Log.error("Erro ao baixar arquivo: " + e.getMessage());
+						Log.info("Passando para o próximo");
 					}
 				}
 			}
@@ -186,28 +191,30 @@ public class DownloadCamila {
 				.addQueryParameter("access_token", ACCESS_TOKEN) //
 				.addQueryParameter("download", true) //
 				.build().toUrl();
-		try (CloseableHttpResponse response = RetryHttpClient.executeWithRetry(2,
-				createHttpExecuteSupplier(new HttpGet(url)))) {
+		
+		Supplier<CloseableHttpResponse> httpRequest = () -> {
+			try {
+				HttpGet request = new HttpGet(url);
+				return createHttpClient(request).execute(request);
+			} catch (Exception e) {
+				Log.error("Erro ao realizar download. [] %s", e.getMessage());
+				throw new RuntimeException(e);
+			}
+		};
+		
+		try (CloseableHttpResponse response = RetryHttpClient.executeWithRetry(3, httpRequest)) {
+			Log.info("Resposta: Status code [%s] | Message: [%s] ", response.getStatusLine().getStatusCode(), response.getStatusLine().getReasonPhrase());
 			HttpEntity entity = response.getEntity();
-			if (entity != null) {
+			if (isSucess(response) && entity != null) {
 				return Util.toByteArray(entity.getContent());
 			}
 			return null;
 		} catch (Exception e) {
+			Log.error("Erro ao realizar download. [] %s", e.getMessage());
 			throw new RuntimeException(e);
 		}
 	}
 
-	private Supplier<CloseableHttpResponse> createHttpExecuteSupplier(HttpGet request) {
-		Supplier<CloseableHttpResponse> httpRequest = () -> {
-			try {
-				return createHttpClient(request).execute(request);
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			}
-		};
-		return httpRequest;
-	}
 
 	private void setHardTimeout(HttpUriRequest request) {
 		int hardTimeout = DEFAULT_HTTP_CLIENT_TIMEOUT_IN_MILLIS;

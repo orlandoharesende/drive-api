@@ -37,12 +37,7 @@ public class UrlBuilder {
 	}
 
 	public UrlBuilder addPathVariable(String chave, String valor) {
-		this.pathVariable.put(chave, valor);
-		if (!chave.startsWith("${")) {
-			this.pathVariable.put(String.format("${%s}", chave), valor);
-		} else {
-			this.pathVariable.put(chave, valor);
-		}
+		this.pathVariable.put(String.format("${%s}", chave), valor);
 		return this;
 	}
 
