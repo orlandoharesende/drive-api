@@ -29,16 +29,24 @@ import br.jus.tjes.integracao.drive.util.Log;
 import br.jus.tjes.integracao.drive.util.Util;
 
 public class DownloadCamila {
-	private static final String ACCESS_TOKEN = "eyJraWQiOiJNOHNrM1VSdnZHMnhKZ3FkZDdYdGhWZnhyQVptdmVvMyIsImFsZyI6IlJTMjU2In0.eyJqdGkiOiJKV1QiLCJhdWQiOiJrZXlzdG9uZSIsImlzcyI6Im0ybS10b2tlbi1zZXJ2aWNlIiwic3ViIjoicHVibGljX3NoYXJlIiwic2NvcGVzIjoibmFzX3JlYWRfb25seSBuYXNfcmVhZF93cml0ZSIsImN1c3RvbUNsYWltcyI6eyJkZXZpY2VJZCI6ImRhYWE3ZmY4LTlhMjctNDE5Mi05Nzk2LTM0NTA3YTQzMGRkYyIsImF1dGhfaWQiOiI3MmU3MDNmMy00NGY0LTQzNGUtYjM3Yi0zMWE5OWQwOGExMGUifSwiZXhwIjoxNjk0NTA3NjQxfQ.arP8xdLaaFONMp3NG_0pvH6m8DtINpeErcZHoJEqmZayxJ6RyXdcpvH7YsExILKG8CHk-ozgSL-k29Km7xJOMjUUVmuEVtytLT7HkijXMGrgQYf07-Up97ZcCfSexZbp5AQ4c0IeNQVAbgyf1aH7KcmaR1Zb2P5hHE16EblUv3VmTLMVDtHUrQIaAoRCqZYZHGdd3keoVrURxSKgRBLIKDNa1cZiAt-mJtc5MsdBMvaoNJIX-5U7aSkmJS2KohB2R05VVEo2IUQUsseaohnl9OHuqog0r6jDRtz3_4WNuUo9vCc1c_BeOJQoHvSaideZWASOl1ac-Y7KlGwX_dL9eg";
+	private static final String ACCESS_TOKEN = "eyJraWQiOiJNOHNrM1VSdnZHMnhKZ3FkZDdYdGhWZnhyQVptdmVvMyIsImFsZyI6IlJTMjU2In0.eyJqdGkiOiJKV1QiLCJhdWQiOiJrZXlzdG9uZSIsImlzcyI6Im0ybS10b2tlbi1zZXJ2aWNlIiwic3ViIjoicHVibGljX3NoYXJlIiwic2NvcGVzIjoibmFzX3JlYWRfb25seSBuYXNfcmVhZF93cml0ZSIsImN1c3RvbUNsYWltcyI6eyJkZXZpY2VJZCI6ImRhYWE3ZmY4LTlhMjctNDE5Mi05Nzk2LTM0NTA3YTQzMGRkYyIsImF1dGhfaWQiOiI5MzY5MTNlZS1kYmYyLTRhNzMtYWIyYi0yMDA4NjU1YjQ2ZDcifSwiZXhwIjoxNjk0ODY1OTY3fQ.VYjebHyQJAxwMJzLF7u3WdLgnX2i6wPAhZaipMO0OGK7I3opUUjnG_FqdtlOEJimdS1h8gI6mGb5-xz3AlvZbhlMRkg5U2GcO30qWWL-qaT7u69dRbIYr0GZyKxccHFQjC8O6HJGfuF9DWACrGLKMqvlxSrLFgmVfJ3i6NpFo111bj5Vk3JBd_-1TmQQp3oKD77rN4BI_FtxWlCzNXAybybv4TYR7iqxgoK_zxAWp2QRA-HQssD4R7xOqL5ouGpCyDBVWrYBvJWydOdB3P5YoQwRPQNeBwWLuU0-LrBg1bbVdVJ07vUyS7l7-iiBgsKqZf3Q9efbglKgnNCjW021oQ";
 	private static final int UM_MINUTO_EM_MILLIS = 60 * 1000;
-	public static final String BASE_URL = "https://prod-7c74fffc718ed01.wdckeystone.com";
+	public static final String BASE_URL = "https://prod-8ba81160b4a2ae3.wdckeystone.com";
 	public static final String KEY = "daaa7ff8-9a27-4192-9796-34507a430ddc";
-	public static final String ID_DIRETORIO_PRINCIPAL = "kfimc4yxsv7sadaghrmtyzrv";
-	public static final String ROOT_DIR = "/home/orlando/camila/pasta-05";
+	public static final String ID_DIRETORIO_PRINCIPAL = "5huwiyeyo7rgm5lri7jegwha";
+	public static final String ROOT_DIR = "/home/orlando/camila/pasta-09";
 	static int qtdRequisicoes = 0;
-	public static final Integer DEFAULT_HTTP_CLIENT_TIMEOUT_IN_MILLIS = UM_MINUTO_EM_MILLIS * 10;
+	public static final Integer DEFAULT_HTTP_CLIENT_TIMEOUT_IN_MILLIS = UM_MINUTO_EM_MILLIS * 30;
 
 	public static void main(String[] args) {
+		System.setProperty("org.apache.commons.logging.Log","org.apache.commons.logging.impl.SimpleLog");
+		System.setProperty("org.apache.commons.logging.simplelog.showdatetime", "true");
+		System.setProperty("org.apache.commons.logging.simplelog.log.org.apache.http.wire", "DEBUG");
+		System.setProperty("org.apache.commons.logging.simplelog.log.org.apache.http.impl.conn", "DEBUG");
+		System.setProperty("org.apache.commons.logging.simplelog.log.org.apache.http.impl.client", "DEBUG");
+		System.setProperty("org.apache.commons.logging.simplelog.log.org.apache.http.client", "DEBUG");
+		System.setProperty("org.apache.commons.logging.simplelog.log.org.apache.http", "DEBUG");
+		
 		DownloadCamila service = new DownloadCamila();
 		try {
 			String idDirPrincipal = ID_DIRETORIO_PRINCIPAL;
@@ -90,6 +98,8 @@ public class DownloadCamila {
 						Log.error("Erro ao baixar arquivo: " + e.getMessage());
 						Log.info("Passando para o próximo");
 					}
+				}else {
+					Log.info("Arquivo [%s]: [%s]", "Já existente", arquivo);
 				}
 			}
 		}

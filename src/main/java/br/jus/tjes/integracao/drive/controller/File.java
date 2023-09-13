@@ -16,7 +16,7 @@ public class File {
 	public boolean publiclyShared;
 	public boolean privatelyShared;
 	public boolean trashed;
-	public int size;
+	public long size;
 	public String extension;
 	public List<File> filhos = new ArrayList<File>();
 	public File pai;
@@ -109,11 +109,11 @@ public class File {
 		this.trashed = trashed;
 	}
 
-	public int getSize() {
+	public long getSize() {
 		return size;
 	}
 
-	public void setSize(int size) {
+	public void setSize(long size) {
 		this.size = size;
 	}
 
