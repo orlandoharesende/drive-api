@@ -29,27 +29,17 @@ import br.jus.tjes.integracao.drive.util.Log;
 import br.jus.tjes.integracao.drive.util.Util;
 
 public class DownloadCamila {
-	private static final String ACCESS_TOKEN = "eyJraWQiOiJNOHNrM1VSdnZHMnhKZ3FkZDdYdGhWZnhyQVptdmVvMyIsImFsZyI6IlJTMjU2In0.eyJqdGkiOiJKV1QiLCJhdWQiOiJrZXlzdG9uZSIsImlzcyI6Im0ybS10b2tlbi1zZXJ2aWNlIiwic3ViIjoicHVibGljX3NoYXJlIiwic2NvcGVzIjoibmFzX3JlYWRfb25seSBuYXNfcmVhZF93cml0ZSIsImN1c3RvbUNsYWltcyI6eyJkZXZpY2VJZCI6ImRhYWE3ZmY4LTlhMjctNDE5Mi05Nzk2LTM0NTA3YTQzMGRkYyIsImF1dGhfaWQiOiI5MzY5MTNlZS1kYmYyLTRhNzMtYWIyYi0yMDA4NjU1YjQ2ZDcifSwiZXhwIjoxNjk0ODY1OTY3fQ.VYjebHyQJAxwMJzLF7u3WdLgnX2i6wPAhZaipMO0OGK7I3opUUjnG_FqdtlOEJimdS1h8gI6mGb5-xz3AlvZbhlMRkg5U2GcO30qWWL-qaT7u69dRbIYr0GZyKxccHFQjC8O6HJGfuF9DWACrGLKMqvlxSrLFgmVfJ3i6NpFo111bj5Vk3JBd_-1TmQQp3oKD77rN4BI_FtxWlCzNXAybybv4TYR7iqxgoK_zxAWp2QRA-HQssD4R7xOqL5ouGpCyDBVWrYBvJWydOdB3P5YoQwRPQNeBwWLuU0-LrBg1bbVdVJ07vUyS7l7-iiBgsKqZf3Q9efbglKgnNCjW021oQ";
 	private static final int UM_MINUTO_EM_MILLIS = 60 * 1000;
-	public static final String BASE_URL = "https://prod-8ba81160b4a2ae3.wdckeystone.com";
-	public static final String KEY = "daaa7ff8-9a27-4192-9796-34507a430ddc";
-	public static final String ID_DIRETORIO_PRINCIPAL = "5huwiyeyo7rgm5lri7jegwha";
-	public static final String ROOT_DIR = "/home/orlando/camila/pasta-09";
+	public static final Integer DEFAULT_HTTP_CLIENT_TIMEOUT_IN_MILLIS = UM_MINUTO_EM_MILLIS * 5;
 	static int qtdRequisicoes = 0;
-	public static final Integer DEFAULT_HTTP_CLIENT_TIMEOUT_IN_MILLIS = UM_MINUTO_EM_MILLIS * 30;
+
+	private static final ConfigDownload config = Configs.DIR_01;
 
 	public static void main(String[] args) {
-		System.setProperty("org.apache.commons.logging.Log","org.apache.commons.logging.impl.SimpleLog");
-		System.setProperty("org.apache.commons.logging.simplelog.showdatetime", "true");
-		System.setProperty("org.apache.commons.logging.simplelog.log.org.apache.http.wire", "DEBUG");
-		System.setProperty("org.apache.commons.logging.simplelog.log.org.apache.http.impl.conn", "DEBUG");
-		System.setProperty("org.apache.commons.logging.simplelog.log.org.apache.http.impl.client", "DEBUG");
-		System.setProperty("org.apache.commons.logging.simplelog.log.org.apache.http.client", "DEBUG");
-		System.setProperty("org.apache.commons.logging.simplelog.log.org.apache.http", "DEBUG");
-		
+
 		DownloadCamila service = new DownloadCamila();
 		try {
-			String idDirPrincipal = ID_DIRETORIO_PRINCIPAL;
+			String idDirPrincipal = config.getMainFolder();
 			List<File> files = service.consultarPastaRecursiva(idDirPrincipal, null);
 			Log.info("Imprimindo estrutura: ");
 			for (File file : files) {
@@ -57,7 +47,7 @@ public class DownloadCamila {
 			}
 			Log.info("Aguardando 30 segungos para iniciar o download dos documentos.");
 			Thread.sleep(30000);
-			service.criarPastasAndDownloadArquivos(files, ROOT_DIR);
+			service.criarPastasAndDownloadArquivos(files, config.getLocalFolder());
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		} finally {
@@ -84,21 +74,21 @@ public class DownloadCamila {
 					Log.info("Fazer download do arquivo: " + name);
 					Log.info("Tamanho do arquivo: " + (file.getSize() / 1024 / 1024) + "MB");
 					try {
-						//Thread.sleep(5000);
+						// Thread.sleep(5000);
 						byte[] arquivoEmBytes = download(file.getId());
-						if(arquivoEmBytes != null) {
+						if (arquivoEmBytes != null) {
 							Log.info("Arquivo baixado.");
 							Log.info("Gravando arquivo.");
 							Files.write(Paths.get(name), arquivoEmBytes);
 							Log.info("Arquivo gravado.");
-						}else {
+						} else {
 							Log.error("Erro ao baixar arquivo.");
 						}
 					} catch (Exception e) {
 						Log.error("Erro ao baixar arquivo: " + e.getMessage());
 						Log.info("Passando para o próximo");
 					}
-				}else {
+				} else {
 					Log.info("Arquivo [%s]: [%s]", "Já existente", arquivo);
 				}
 			}
@@ -123,9 +113,9 @@ public class DownloadCamila {
 	public Root consultarPasta(String id) throws IOException {
 		Log.info("[%s][QTD=%s] Requisição: id = %s", new Date(), ++qtdRequisicoes, id);
 		String fields = "pageToken,id,cTime,mTime,mimeType,name,parentID,extension,size,publiclyShared,privatelyShared,video,audio,image,family,tags,description,autoTags,trashed,document,storageType,storageID";
-		String url = UrlBuilder.builder(BASE_URL) //
-				.path("/${key}/sdk/v2/filesSearch/parents") //
-				.addPathVariable("key", KEY) //
+		String url = UrlBuilder.builder(config.getBaseUrl()) //
+				.path("/${device-id}/sdk/v2/filesSearch/parents") //
+				.addPathVariable("device-id", config.getDeviceId()) //
 				.addQueryParameter("pretty", "false") //
 				.addQueryParameter("ids", id) //
 				.addQueryParameter("fields", fields) //
@@ -162,12 +152,10 @@ public class DownloadCamila {
 	}
 
 	private void addHeadersToFileSearch(HttpGet request) {
-		request.addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + ACCESS_TOKEN);
-		request.addHeader("authority", "prod-7c74fffc718ed01.wdckeystone.com");
-		request.addHeader("authority", "prod-7c74fffc718ed01.wdckeystone.com");
+		request.addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + config.getAccessToken());
+		request.addHeader("authority", config.getAuthority());
 		request.addHeader("accept", "*/*");
 		request.addHeader("accept-language", "pt-BR,pt;q=0.8");
-		request.addHeader("authorization", "Bearer " + ACCESS_TOKEN);
 		request.addHeader("cache-control", "no-cache");
 		request.addHeader("origin", "https://os5.mycloud.com");
 		request.addHeader("pragma", "no-cache");
@@ -180,7 +168,7 @@ public class DownloadCamila {
 		request.addHeader("sec-fetch-site", "cross-site");
 		request.addHeader("user-agent",
 				"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36");
-		request.addHeader("x-correlation-id", "w_g:9333a6c6-fc0b-4e9f-847e-7471965c1ba5");
+		request.addHeader("x-correlation-id", config.getCorrelationId());
 	}
 
 	private CloseableHttpResponse executeHttpClient(HttpUriRequest request)
@@ -195,13 +183,13 @@ public class DownloadCamila {
 	}
 
 	public byte[] download(String id) {
-		String url = UrlBuilder.builder(BASE_URL).path("${key}/sdk/v2/files/${id}/content") //
-				.addPathVariable("key", KEY) //
+		String url = UrlBuilder.builder(config.getBaseUrl()).path("${device-id}/sdk/v2/files/${id}/content") //
+				.addPathVariable("device-id", config.getDeviceId()) //
 				.addPathVariable("id", id) //
-				.addQueryParameter("access_token", ACCESS_TOKEN) //
+				.addQueryParameter("access_token", config.getAccessToken()) //
 				.addQueryParameter("download", true) //
 				.build().toUrl();
-		
+
 		Supplier<CloseableHttpResponse> httpRequest = () -> {
 			try {
 				HttpGet request = new HttpGet(url);
@@ -211,9 +199,10 @@ public class DownloadCamila {
 				throw new RuntimeException(e);
 			}
 		};
-		
+
 		try (CloseableHttpResponse response = RetryHttpClient.executeWithRetry(3, httpRequest)) {
-			Log.info("Resposta: Status code [%s] | Message: [%s] ", response.getStatusLine().getStatusCode(), response.getStatusLine().getReasonPhrase());
+			Log.info("Resposta: Status code [%s] | Message: [%s] ", response.getStatusLine().getStatusCode(),
+					response.getStatusLine().getReasonPhrase());
 			HttpEntity entity = response.getEntity();
 			if (isSucess(response) && entity != null) {
 				return Util.toByteArray(entity.getContent());
@@ -224,7 +213,6 @@ public class DownloadCamila {
 			throw new RuntimeException(e);
 		}
 	}
-
 
 	private void setHardTimeout(HttpUriRequest request) {
 		int hardTimeout = DEFAULT_HTTP_CLIENT_TIMEOUT_IN_MILLIS;
