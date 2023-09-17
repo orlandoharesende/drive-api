@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+
 public class File {
 	public String id;
 	public String parentID;
@@ -20,6 +22,7 @@ public class File {
 	public String extension;
 	public List<File> filhos = new ArrayList<File>();
 	public File pai;
+	public int nivel;
 
 	public String getId() {
 		return id;
@@ -128,11 +131,23 @@ public class File {
 	@Override
 	public String toString() {
 		StringBuilder texto = new StringBuilder();
-		texto.append(String.format("File: %s | %s | (Dir=%s) ", id, name, isDir()));
-		if(filhos != null) {
+		String legenda = (isDir() ? "█ DIR" : "■ FILE");
+		texto.append(String.format(" %s %s: %s (%s)", getIconTree(this.nivel), legenda, name, id));
+		if (filhos != null) {
 			for (File file : filhos) {
-				texto.append("\n     - " + file.toString());
+				texto.append("\n");
+				texto.append(file.toString());
 			}
+		}
+		return texto.toString();
+	}
+
+	private static String getIconTree(int nivel) {
+		StringBuilder texto = new StringBuilder();
+		nivel = nivel -1;
+		if (nivel > 0) {
+			texto.append(StringUtils.leftPad("", nivel * 4, " "));
+			texto.append(StringUtils.rightPad("├", 4, "─"));
 		}
 		return texto.toString();
 	}
@@ -155,6 +170,14 @@ public class File {
 
 	public void setPai(File pai) {
 		this.pai = pai;
+	}
+
+	public int getNivel() {
+		return nivel;
+	}
+
+	public void setNivel(int nivel) {
+		this.nivel = nivel;
 	}
 
 }

@@ -40,12 +40,10 @@ public class DownloadCamila {
 		DownloadCamila service = new DownloadCamila();
 		try {
 			String idDirPrincipal = config.getMainFolder();
-			List<File> files = service.consultarPastaRecursiva(idDirPrincipal, null);
-			Log.info("Imprimindo estrutura: ");
-			for (File file : files) {
-				System.out.println(file);
-			}
-			Log.info("Aguardando 30 segungos para iniciar o download dos documentos.");
+			List<File> files = service.consultarPastaRecursiva(idDirPrincipal, null, 0);
+			Log.info("Imprimindo estrutura: \n\n");
+			files.forEach(f -> System.out.println(f));
+			Log.info("Aguardando 30 segundos para iniciar o download dos documentos.");
 			Thread.sleep(30000);
 			service.criarPastasAndDownloadArquivos(files, config.getLocalFolder());
 		} catch (Exception e) {
@@ -95,15 +93,17 @@ public class DownloadCamila {
 		}
 	}
 
-	public List<File> consultarPastaRecursiva(String id, File pai) throws IOException {
+	public List<File> consultarPastaRecursiva(String id, File pai, int nivel) throws IOException {
+		nivel++;
 		Root root = consultarPasta(id);
 		if (root == null || root.getFiles() == null || root.getFiles().isEmpty()) {
 			return Collections.emptyList();
 		}
 
 		for (File file : root.getFiles()) {
+			file.setNivel(nivel);
 			if (file.isDir()) {
-				file.getFilhos().addAll(consultarPastaRecursiva(file.getId(), pai));
+				file.getFilhos().addAll(consultarPastaRecursiva(file.getId(), pai, nivel));
 				file.getFilhos().stream().forEach(f -> f.setPai(pai));
 			}
 		}
@@ -130,6 +130,8 @@ public class DownloadCamila {
 			HttpEntity entity = response.getEntity();
 			if (isSucess(response) && entity != null) {
 				return convertToObjectEntity(entity, Root.class);
+			} else {
+				Log.error("Erro: Status code: %s", response.getStatusLine().getStatusCode());
 			}
 			return null;
 		} catch (Exception e) {
@@ -182,25 +184,18 @@ public class DownloadCamila {
 		return objectMapper;
 	}
 
-	public byte[] download(String id) {
-		String url = UrlBuilder.builder(config.getBaseUrl()).path("${device-id}/sdk/v2/files/${id}/content") //
+	public byte[] download(String fileId) {
+		String url = UrlBuilder.builder(config.getBaseUrl()).path("${device-id}/sdk/v2/files/${fileId}/content") //
 				.addPathVariable("device-id", config.getDeviceId()) //
-				.addPathVariable("id", id) //
+				.addPathVariable("fileId", fileId) //
 				.addQueryParameter("access_token", config.getAccessToken()) //
 				.addQueryParameter("download", true) //
 				.build().toUrl();
 
-		Supplier<CloseableHttpResponse> httpRequest = () -> {
-			try {
-				HttpGet request = new HttpGet(url);
-				return createHttpClient(request).execute(request);
-			} catch (Exception e) {
-				Log.error("Erro ao realizar download. [] %s", e.getMessage());
-				throw new RuntimeException(e);
-			}
-		};
+		// Supplier<CloseableHttpResponse> httpRequest = createSupplierHttp(url);
+		HttpGet request = new HttpGet(url);
 
-		try (CloseableHttpResponse response = RetryHttpClient.executeWithRetry(3, httpRequest)) {
+		try (CloseableHttpResponse response = createHttpClient(request).execute(request)) {
 			Log.info("Resposta: Status code [%s] | Message: [%s] ", response.getStatusLine().getStatusCode(),
 					response.getStatusLine().getReasonPhrase());
 			HttpEntity entity = response.getEntity();
@@ -212,6 +207,19 @@ public class DownloadCamila {
 			Log.error("Erro ao realizar download. [] %s", e.getMessage());
 			throw new RuntimeException(e);
 		}
+	}
+
+	private Supplier<CloseableHttpResponse> createSupplierHttp(String url) {
+		Supplier<CloseableHttpResponse> httpRequest = () -> {
+			try {
+				HttpGet request = new HttpGet(url);
+				return createHttpClient(request).execute(request);
+			} catch (Exception e) {
+				Log.error("Erro ao realizar download. [] %s", e.getMessage());
+				throw new RuntimeException(e);
+			}
+		};
+		return httpRequest;
 	}
 
 	private void setHardTimeout(HttpUriRequest request) {
