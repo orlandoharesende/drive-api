@@ -131,7 +131,7 @@ public class File {
 	@Override
 	public String toString() {
 		StringBuilder texto = new StringBuilder();
-		String legenda = (isDir() ? "█ DIR" : "■ FILE");
+		String legenda = (isDir() ? "»█ DIR" : "¤ FILE");
 		texto.append(String.format(" %s %s: %s (%s)", getIconTree(this.nivel), legenda, name, id));
 		if (filhos != null) {
 			for (File file : filhos) {

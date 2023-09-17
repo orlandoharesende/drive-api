@@ -30,10 +30,10 @@ import br.jus.tjes.integracao.drive.util.Util;
 
 public class DownloadCamila {
 	private static final int UM_MINUTO_EM_MILLIS = 60 * 1000;
-	public static final Integer DEFAULT_HTTP_CLIENT_TIMEOUT_IN_MILLIS = UM_MINUTO_EM_MILLIS * 5;
+	public static final Integer DEFAULT_HTTP_CLIENT_TIMEOUT_IN_MILLIS = UM_MINUTO_EM_MILLIS * 25;
 	static int qtdRequisicoes = 0;
 
-	private static final ConfigDownload config = Configs.DIR_01;
+	private static final ConfigDownload config = Configs.DIR_05;
 
 	public static void main(String[] args) {
 
@@ -103,7 +103,7 @@ public class DownloadCamila {
 		for (File file : root.getFiles()) {
 			file.setNivel(nivel);
 			if (file.isDir()) {
-				file.getFilhos().addAll(consultarPastaRecursiva(file.getId(), pai, nivel));
+				file.getFilhos().addAll(consultarPastaRecursiva(file.getId(), file, nivel));
 				file.getFilhos().stream().forEach(f -> f.setPai(pai));
 			}
 		}
@@ -227,8 +227,8 @@ public class DownloadCamila {
 		TimerTask task = new TimerTask() {
 			@Override
 			public void run() {
-				request.abort();
 				Log.error("Conexão abortada!!");
+				request.abort();
 			}
 		};
 		new Timer(true).schedule(task, hardTimeout);
