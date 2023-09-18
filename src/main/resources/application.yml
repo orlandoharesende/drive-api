@@ -38,6 +38,8 @@ environments:
       tempoExpiracaoEmSegundos: 60
       qtdUtilizacaoPermitida: 2
       secret: MTIzNDU2NzgwYWJjZGVmZ2hpamtsw6dsbHh6MHdxbMOnw6dz4bmVZGZzZnNhw6dsw6dzYWRvMGprc3BzbHNsc21wcXJldA==
+    auth:
+      secret: NTkyMGM0NzZhNTJkOWUyZDhmNDQ0ODBlZDIxN2Y0Y2EzZGY5Y2VlNWhkanM5YWdkeWFzYmRoamhkc2phNDU2ZDc4YXNkZHNhZHNhMTQ2NTI=
    
     
     

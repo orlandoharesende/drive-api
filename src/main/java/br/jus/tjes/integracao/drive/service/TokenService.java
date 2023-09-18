@@ -49,19 +49,28 @@ public class TokenService {
 		return td;
 	}
 
-	private Claims validarToken(String token)
+	public Claims validarToken(String token, SecretKey key)
 			throws ExpiredJwtException, MalformedJwtException, SignatureException, JwtException {
-
 		Claims informacaoToken = null;
-		informacaoToken = Jwts.parserBuilder().setSigningKey(getKey()).build().parseClaimsJws(token).getBody();
-
+		informacaoToken = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
 		return informacaoToken;
 
 	}
 
-	private SecretKey getKey() {
-		return Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret));
-
+	private Claims validarToken(String token)
+			throws ExpiredJwtException, MalformedJwtException, SignatureException, JwtException {
+		return validarToken(token, getKey());
 	}
 
+	private SecretKey getKey() {
+		return Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret));
+	}
+
+	public SecretKey getKey(String secret) {
+		return Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret));
+	}
+
+	public Claims validarToken(String token, String secret) {
+		return validarToken(token, getKey(secret));
+	}
 }
