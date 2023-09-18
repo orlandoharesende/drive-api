@@ -3,7 +3,9 @@ package br.jus.tjes.integracao.drive.security;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +16,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
 
@@ -28,25 +31,26 @@ import jakarta.servlet.http.HttpServletResponse;
 
 @Component
 public class TokenAuthenticationFilter extends GenericFilterBean {
+	private static final Logger LOG = LoggerFactory.getLogger(TokenAuthenticationFilter.class);
+	protected static List<String> emissoresAutorizados = Arrays.asList("pje-tjes-1g", "pje-tjes-2g");
+	private Set<AntPathRequestMatcher> matchersUrlsPublicas = new HashSet<>();
+	private Set<AntPathRequestMatcher> matchersUrlsAutenticadas = new HashSet<>();
+
 	@Value("${environments.auth.secret}")
 	private String secret;
 	@Autowired
 	private TokenService tokenService;
-	protected static List<String> emissoresAutorizados = Arrays.asList("pje-tjes-1g", "pje-tjes-2g");
-
-	private static final Logger LOG = LoggerFactory.getLogger(TokenAuthenticationFilter.class);
 
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain filterChain)
 			throws IOException, ServletException {
 		try {
-			String token = extractToken((HttpServletRequest) request);
-			if (isValidToken(token)) {
-				processarAutenticacao(token);
+			HttpServletRequest httpServletRequest = (HttpServletRequest) request;
+			if (isAuthenticatedUrl(httpServletRequest)) {
+				processarAutenticacao(httpServletRequest);
 				filterChain.doFilter(request, response);
 			} else {
-				LOG.error("Erro ao realizar autenticação.");
-				configurarRespostaNaoAutorizado(response);
+				filterChain.doFilter(request, response);
 			}
 		} catch (Exception e) {
 			LOG.error("Erro ao realizar autenticação: " + e.getMessage());
@@ -54,7 +58,16 @@ public class TokenAuthenticationFilter extends GenericFilterBean {
 		}
 	}
 
-	private void processarAutenticacao(String token) {
+	private void processarAutenticacao(HttpServletRequest httpServletRequest) throws IOException, ServletException {
+		String token = extractToken(httpServletRequest);
+		if (isValidToken(token)) {
+			configurarAutenticacaoComSucesso(token);
+		} else {
+			throw new RuntimeException("Token inválido.");
+		}
+	}
+
+	private void configurarAutenticacaoComSucesso(String token) {
 		CustomAuthToken authToken = new CustomAuthToken(token);
 		List<GrantedAuthority> authorities = getAuthoritiesFromToken(token);
 		Authentication authentication = new UsernamePasswordAuthenticationToken(authToken, null, authorities);
@@ -82,7 +95,7 @@ public class TokenAuthenticationFilter extends GenericFilterBean {
 		if (emissor == null) {
 			return false;
 		}
-		return emissoresAutorizados.contains(emissor.toUpperCase());
+		return emissoresAutorizados.contains(emissor.toLowerCase());
 	}
 
 	private String tokenSemPrefixo(String token) {
@@ -92,4 +105,25 @@ public class TokenAuthenticationFilter extends GenericFilterBean {
 	private List<GrantedAuthority> getAuthoritiesFromToken(String token) {
 		return Collections.emptyList();
 	}
+
+	private boolean isAuthenticatedUrl(HttpServletRequest request) {
+		return !getMatchersUrlsPublicas().stream().filter(m -> m.matches(request)).findAny().isPresent();
+	}
+
+	public Set<AntPathRequestMatcher> getMatchersUrlsPublicas() {
+		return matchersUrlsPublicas;
+	}
+
+	public void setMatchersUrlsPublicas(Set<AntPathRequestMatcher> matchersUrlsPublicas) {
+		this.matchersUrlsPublicas = matchersUrlsPublicas;
+	}
+
+	public Set<AntPathRequestMatcher> getMatchersUrlsAutenticadas() {
+		return matchersUrlsAutenticadas;
+	}
+
+	public void setMatchersUrlsAutenticadas(Set<AntPathRequestMatcher> matchersUrlsAutenticadas) {
+		this.matchersUrlsAutenticadas = matchersUrlsAutenticadas;
+	}
+
 }

@@ -33,7 +33,7 @@ spring:
  
 environments:
 
-    pathArquivoCredenciais: /home/t317549/desenvolvimento/credenciais-api-drive/user-google-drive-orlando.json
+    pathArquivoCredenciais: /home/orlando/tjes/integracao-google/user-google-drive-orlando.json
     urlTemporaria:
       tempoExpiracaoEmSegundos: 60
       qtdUtilizacaoPermitida: 2

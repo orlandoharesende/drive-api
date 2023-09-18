@@ -46,7 +46,7 @@ public class UrlTemporariaService {
 		claims.put(EnumClaimsAdicionais.NR_PROCESSO.getDescricao(), documento.getNumeroProcesso());
 
 		String token = tokenService.geradorDeTokenTemporario(claims);
-		return baseUrl.concat("/download/tmp?").concat("id=").concat(token);
+		return baseUrl.concat("/api/download/tmp?").concat("id=").concat(token);
 	}
 	
 	public TokenDocumento getArquivoRemoto(String token, String emissor) throws UrlInvalidaException, ExpiredJwtException, MalformedJwtException, SignatureException, JwtException {
