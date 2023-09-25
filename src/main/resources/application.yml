@@ -32,14 +32,13 @@ spring:
       config: classpath:ehcache.xml      
  
 environments:
-
-    pathArquivoCredenciais: /home/orlando/tjes/integracao-google/user-google-drive-orlando.json
+    pathArquivoCredenciais: ${PATH_ARQUIVO_CREDENCIAIS:/home/orlando/tjes/integracao-google/user-google-drive-orlando.json}
     urlTemporaria:
-      tempoExpiracaoEmSegundos: 60
-      qtdUtilizacaoPermitida: 2
-      secret: MTIzNDU2NzgwYWJjZGVmZ2hpamtsw6dsbHh6MHdxbMOnw6dz4bmVZGZzZnNhw6dsw6dzYWRvMGprc3BzbHNsc21wcXJldA==
+      tempoExpiracaoEmSegundos: ${TEMPO_EXPIRACAO_URL:60}
+      qtdUtilizacaoPermitida: ${QTD_UTILIZACAO_URL:2}
+      secret: ${SECRET_URL:MTIzNDU2NzgwYWJjZGVmZ2hpamtsw6dsbHh6MHdxbMOnw6dz4bmVZGZzZnNhw6dsw6dzYWRvMGprc3BzbHNsc21wcXJldA==}
     auth:
-      secret: NTkyMGM0NzZhNTJkOWUyZDhmNDQ0ODBlZDIxN2Y0Y2EzZGY5Y2VlNWhkanM5YWdkeWFzYmRoamhkc2phNDU2ZDc4YXNkZHNhZHNhMTQ2NTI=
+      secret: ${SECRET_AUTH:NTkyMGM0NzZhNTJkOWUyZDhmNDQ0ODBlZDIxN2Y0Y2EzZGY5Y2VlNWhkanM5YWdkeWFzYmRoamhkc2phNDU2ZDc4YXNkZHNhZHNhMTQ2NTI=}
    
     
     
