@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import br.jus.tjes.integracao.drive.dto.ArquivoDTO;
 import br.jus.tjes.integracao.drive.exception.NumeroProcessoInvalidoException;
 import br.jus.tjes.integracao.drive.util.NumeroProcessoUtil;
+import br.jus.tjes.integracao.drive.util.StringUtil;
 
 @Service
 public class DriveApiService {
@@ -44,25 +45,25 @@ public class DriveApiService {
 	}
 
 	private String getQueryFiltrarApenasDiretorioPorNome(String numeroProcesso) {
-		return q("name = '%s' and mimeType = '%s'", numeroProcesso, GoogleDriveApi.MIME_TYPE_FOLDER);
+		return q("name = '%s' and mimeType = '%s'", StringUtil.removerNaoNumeros(numeroProcesso),
+				GoogleDriveApi.MIME_TYPE_FOLDER);
 	}
 
 	@Cacheable(value = "DriveApiServiceGetArquivo")
 	public ArquivoDTO getArquivo(String numeroProcesso, String idArquivo) {
 		validarNumeroProcesso(numeroProcesso);
-		return googleDriveApi.getArquivo(numeroProcesso, idArquivo);
+		return googleDriveApi.getArquivo(StringUtil.removerNaoNumeros(numeroProcesso), idArquivo);
 	}
 
 	public byte[] getArquivoEmBytes(String numeroProcesso, String idArquivo) {
 		validarNumeroProcesso(numeroProcesso);
-		return googleDriveApi.getArquivoEmBytes(numeroProcesso, idArquivo);
+		return googleDriveApi.getArquivoEmBytes(StringUtil.removerNaoNumeros(numeroProcesso), idArquivo);
 	}
 
 	private void validarNumeroProcesso(String numeroProcesso) {
-		/*
-		 * if (!NumeroProcessoUtil.numeroProcessoValido(numeroProcesso)) { throw new
-		 * NumeroProcessoInvalidoException(); }
-		 */
+		if (!NumeroProcessoUtil.numeroProcessoValido(numeroProcesso)) {
+			throw new NumeroProcessoInvalidoException();
+		}
 	}
 
 	private String q(String query, Object... valores) {

@@ -29,8 +29,15 @@ public class StringUtil {
 	public static boolean isEmpty(StringBuilder sb) {
 		return sb == null || sb.toString().trim().isEmpty();
 	}
-	
+
 	public static boolean isEmpty(String valor) {
 		return valor == null || valor.trim().isEmpty();
+	}
+
+	public static String removerNaoNumeros(String texto) {
+		if (texto == null) {
+			return null;
+		}
+		return texto.replaceAll("[^0-9]", "").trim();
 	}
 }

@@ -2,6 +2,7 @@ package br.jus.tjes.integracao.drive.service;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -49,9 +50,11 @@ public class GoogleDriveApi {
 	public List<ArquivoDTO> listarArquivos(String numeroProcesso, String query) {
 		HttpGet request = new HttpGet(URL_LIST_FILES);
 		addBasicHeaders(request);
-		if (query != null) {
-			addQueryParams(request, Arrays.asList(new BasicNameValuePair("q", query)));
-		}
+		List<NameValuePair> params = new ArrayList<NameValuePair>();
+		params.add(new BasicNameValuePair("q", query));
+		params.addAll(getParamsPesquisarEmTodosOsDrives());
+		addQueryParams(request, params);
+
 		try (CloseableHttpResponse response = HttpClients.createDefault().execute(request)) {
 			logarRequisicao(response, URL_LIST_FILES, numeroProcesso);
 			validarRequisicao(response);
@@ -72,6 +75,9 @@ public class GoogleDriveApi {
 	public ArquivoDTO getArquivo(String numeroProcesso, String idArquivo) {
 		String uri = URL_LIST_FILES + idArquivo;
 		HttpGet request = new HttpGet(uri);
+		List<NameValuePair> params = new ArrayList<NameValuePair>();
+		params.addAll(getParamsPesquisarEmTodosOsDrives());
+		addQueryParams(request, params);
 		addBasicHeaders(request);
 		try (CloseableHttpResponse response = HttpClients.createDefault().execute(request)) {
 			logarRequisicao(response, uri, numeroProcesso);
@@ -88,10 +94,21 @@ public class GoogleDriveApi {
 		}
 	}
 
+	private List<NameValuePair> getParamsPesquisarEmTodosOsDrives() {
+		List<NameValuePair> params = new ArrayList<NameValuePair>();
+		params.add(new BasicNameValuePair("corpora", "allDrives"));
+		params.add(new BasicNameValuePair("supportsAllDrives", "true"));
+		params.add(new BasicNameValuePair("includeItemsFromAllDrives", "true"));
+		return params;
+	}
+
 	public byte[] getArquivoEmBytes(String numeroProcesso, String idArquivo) {
 		String url = URL_LIST_FILES + idArquivo;
 		HttpGet request = new HttpGet(url);
-		addQueryParams(request, Arrays.asList(new BasicNameValuePair("alt", "media")));
+		List<NameValuePair> params = new ArrayList<NameValuePair>();
+		params.addAll(getParamsPesquisarEmTodosOsDrives());
+		params.add(new BasicNameValuePair("alt", "media"));
+		addQueryParams(request, params);
 		addBasicHeaders(request);
 		try (CloseableHttpResponse response = HttpClients.createDefault().execute(request)) {
 			logarRequisicao(response, url, numeroProcesso);
