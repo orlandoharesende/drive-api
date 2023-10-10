@@ -29,19 +29,28 @@ public class DriveApiService {
 		validarSeDiretorioValido(listaDiretorios);
 		ArquivoDTO diretorio = listaDiretorios.get(0);
 		List<ArquivoDTO> listaArquivos = googleDriveApi.listarArquivos(numeroProcesso,
-				getQueryListaArquivosPorDiretorio(diretorio));
+				getQueryListaArquivosPorDiretorio(diretorio.getId()));
 		listaArquivos.forEach(a -> a.setNumeroProcesso(numeroProcesso));
 		return listaArquivos;
 	}
 
+	@Cacheable(value = "DriveApiServiceListarArquivosPorDiretorioProcessoDiretorioFilho")
+	public List<ArquivoDTO> listarArquivosPorDiretorioProcesso(String numeroProcesso, String idDiretorio) {
+		validarNumeroProcesso(numeroProcesso);
+		List<ArquivoDTO> listaArquivos = googleDriveApi.listarArquivos(numeroProcesso,
+				getQueryListaArquivosPorDiretorio(idDiretorio));
+		listaArquivos.forEach(a -> a.setNumeroProcesso(numeroProcesso));
+		return listaArquivos;
+	}
+	
 	private void validarSeDiretorioValido(List<ArquivoDTO> listaDiretorios) {
 		if (listaDiretorios.size() > 1) {
 			throw new RuntimeException("Existe mais de um diretório com o mesmo nome.");
 		}
 	}
 
-	private String getQueryListaArquivosPorDiretorio(ArquivoDTO diretorio) {
-		return q("'%s' in parents", diretorio.getId());
+	private String getQueryListaArquivosPorDiretorio(String idDiretorio) {
+		return q("'%s' in parents", idDiretorio);
 	}
 
 	private String getQueryFiltrarApenasDiretorioPorNome(String numeroProcesso) {

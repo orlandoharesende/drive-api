@@ -48,6 +48,14 @@ public class DriveApiController {
 		List<ArquivoDTO> lista = service.listarArquivosPorDiretorioProcesso(numeroProcesso);		
 		return ResponseEntity.ok(lista);
 	}
+	
+	@Operation(summary = "Consulta Lista de Arquivos")
+	@GetMapping(path = "/{numero-processo}/{id-diretorio}/arquivos", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<List<ArquivoDTO>> consultarListaArquivosPorDiretorio(
+			@PathVariable("numero-processo") String numeroProcesso, @PathVariable("id-diretorio") String idDiretorio) {
+		List<ArquivoDTO> lista = service.listarArquivosPorDiretorioProcesso(numeroProcesso, idDiretorio);		
+		return ResponseEntity.ok(lista);
+	}
 
 	@Operation(summary = "Consulta Arquivo Específico")
 	@GetMapping(path = "/{numero-processo}/arquivos/{id-arquivo}", produces = MediaType.APPLICATION_JSON_VALUE)
