@@ -12,6 +12,8 @@ public class ArquivoDTO {
 	private String uri;
 	@JsonInclude(Include.NON_NULL)
 	private String download;
+	@JsonInclude(Include.NON_NULL)
+	private ArquivoDTO diretorioPai;
 
 	public String getId() {
 		return id;
@@ -67,6 +69,14 @@ public class ArquivoDTO {
 
 	public void setNumeroProcesso(String numeroProcesso) {
 		this.numeroProcesso = numeroProcesso;
+	}
+
+	public ArquivoDTO getDiretorioPai() {
+		return diretorioPai;
+	}
+
+	public void setDiretorioPai(ArquivoDTO diretorioPai) {
+		this.diretorioPai = diretorioPai;
 	}
 
 }

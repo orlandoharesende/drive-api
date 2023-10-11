@@ -30,19 +30,36 @@ public class DriveApiService {
 		ArquivoDTO diretorio = listaDiretorios.get(0);
 		List<ArquivoDTO> listaArquivos = googleDriveApi.listarArquivos(numeroProcesso,
 				getQueryListaArquivosPorDiretorio(diretorio.getId()));
-		listaArquivos.forEach(a -> a.setNumeroProcesso(numeroProcesso));
+		ajustarInformacoesComplementares(numeroProcesso, diretorio, listaArquivos);
 		return listaArquivos;
+	}
+
+	private void ajustarInformacoesComplementares(String numeroProcesso, ArquivoDTO diretorio,
+			List<ArquivoDTO> listaArquivos) {
+		diretorio.setNumeroProcesso(numeroProcesso);
+		listaArquivos.forEach(a -> a.setDiretorioPai(diretorio));
+		listaArquivos.forEach(a -> a.setNumeroProcesso(numeroProcesso));
 	}
 
 	@Cacheable(value = "DriveApiServiceListarArquivosPorDiretorioProcessoDiretorioFilho")
 	public List<ArquivoDTO> listarArquivosPorDiretorioProcesso(String numeroProcesso, String idDiretorio) {
 		validarNumeroProcesso(numeroProcesso);
+		ArquivoDTO diretorioPai = criarRepresentacaoMinimaDiretorioPai(idDiretorio, numeroProcesso);
 		List<ArquivoDTO> listaArquivos = googleDriveApi.listarArquivos(numeroProcesso,
 				getQueryListaArquivosPorDiretorio(idDiretorio));
-		listaArquivos.forEach(a -> a.setNumeroProcesso(numeroProcesso));
+		ajustarInformacoesComplementares(numeroProcesso, diretorioPai, listaArquivos);
 		return listaArquivos;
 	}
-	
+
+	private ArquivoDTO criarRepresentacaoMinimaDiretorioPai(String idDiretorio, String numeroProcesso) {
+		ArquivoDTO diretorioPai = new ArquivoDTO();
+		diretorioPai.setDiretorio(true);
+		diretorioPai.setMimeType("folder");
+		diretorioPai.setId(idDiretorio);
+		diretorioPai.setNumeroProcesso(numeroProcesso);
+		return diretorioPai;
+	}
+
 	private void validarSeDiretorioValido(List<ArquivoDTO> listaDiretorios) {
 		if (listaDiretorios.size() > 1) {
 			throw new RuntimeException("Existe mais de um diretório com o mesmo nome.");
